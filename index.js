@@ -1,3 +1,4 @@
+require("dotenv").config();
 const Mesh = require("@meshsdk/core");
 const Octokit = require("@octokit/core").Octokit;
 const Blockfrost = require("@blockfrost/blockfrost-js");
@@ -82,6 +83,10 @@ const octokit = new Octokit({ auth: process.env.GITHUB_KEY });
           .then((utxos) => console.log(key))
           // do nothing if wallet is not used
           .catch((err) => err);
+
+        // If utxos are found then you may go ahead and build
+        // the transaction by following the guide
+        // https://meshjs.dev/apis/transaction
       }
     }
   }

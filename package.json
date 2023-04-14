@@ -4,5 +4,8 @@
     "@meshsdk/core": "^1.5.2",
     "@octokit/core": "^4.2.0",
     "axios": "^1.3.5"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3"
   }
 }
