@@ -1,8 +1,9 @@
 # Scanning github code for compromised payment keys in cardano
 
+Sometimes people make mistakes uploading private or sensitive keys on github, in this project we will be looking for payment signing keys on github using [octokit-js](https://www.npmjs.com/package/@octokit/core#rest-api-example) for github search and [mesh-js](https://meshjs.dev/) for creating and submitting transactions.
+
 [![stack](https://skillicons.dev/icons?i=js)](https://skillicons.dev)
 
-Sometimes people make mistakes uploading private or sensitive keys on github, in this project we will be looking for payment signing keys on github using [octokit-js](https://www.npmjs.com/package/@octokit/core#rest-api-example) for github search and [mesh-js](https://meshjs.dev/) for creating and submitting transactions.
 
 **Resources**
 
