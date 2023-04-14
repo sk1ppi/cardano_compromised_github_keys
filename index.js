@@ -1,79 +1,87 @@
+const Mesh = require("@meshsdk/core");
 const Octokit = require("@octokit/core").Octokit;
-const Meshsdk = require("@meshsdk/core");
 const Blockfrost = require("@blockfrost/blockfrost-js");
 
-// 0 testnet || 1 mainnet
-const networkId = 0;
-
-const githubKey = "GITHUB_KEY";
-const blockfrostKey = "BLOCKFROST_KEY";
-
-const blockfrostApi = new Blockfrost.BlockFrostAPI({
-  projectId: blockfrostKey, // see: https://blockfrost.io
-  // For a list of all options see section below
+// Blockfrost API
+const blockfrost = new Blockfrost.BlockFrostAPI({
+  projectId: process.env.BLOCKFROST_KEY,
 });
 
-const blockchainProvider = new Meshsdk.BlockfrostProvider(blockfrostKey);
+// Mesh
+const blockchainProvider = new Mesh.BlockfrostProvider(
+  process.env.BLOCKFROST_KEY
+);
 
-// Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
-const octokit = new Octokit({ auth: githubKey });
+// Create a personal access token at https://github.com/settings/tokens/new
+const octokit = new Octokit({ auth: process.env.GITHUB_KEY });
 
 (async () => {
-  const keyList = [];
-  let octoPage = 1;
-  let octoItems = [];
+  // GET request page
+  let page = 1;
+
+  // List of payment keys scanned
+  let items = [];
 
   while (true) {
-    // Query github api and search for code containing the query
-    octoItems = await octokit
+    // GET items in github search
+    items = await octokit
+      // code search
       .request("GET /search/code", {
+        // any code content that has paymentsigningkeyshelley_ed25519
         q: "paymentsigningkeyshelley_ed25519",
         per_page: 100,
-        page: octoPage,
+        // current page
+        page: page,
       })
       .then((response) => response.data.items);
 
-    if (!octoItems) break;
-    else octoPage += 1;
+    // no result break the loop
+    if (!items) break;
+    // else assign next page
+    else page += 1;
 
-    // loop through each item in query
-    for (const data of octoItems) {
-      // get content of file
+    // for each item in results
+    for (const data of items) {
+      // GET code content in base64
       const contentBase64 = await octokit
         .request("GET " + data.url)
         .then((response) => response.data.content);
 
-      // transform file to readable string
+      // Transform base64 to readable string
       const contentString = Buffer.from(contentBase64, "base64").toString();
 
-      // match any string that starts wit 5820
+      // match any string that starts with 5820
+      // from the content
       const regex = /(?<!\w)5820\w+/g;
-      const paymentKeys = contentString.match(regex);
+      const keys = contentString.match(regex);
 
-      if (!paymentKeys) continue;
+      // no keys continue to next item
+      if (!keys) continue;
 
-      for (const key of paymentKeys) {
+      // for each key
+      for (const key of keys) {
         // load wallet using meshsdk
-        const wallet = new Meshsdk.AppWallet({
-          // 0 testnet
-          // 1 mainnet
-          networkId: networkId,
+        const wallet = new Mesh.AppWallet({
+          networkId: 0, // 0 is testnet // 1 is mainnet
           fetcher: blockchainProvider,
           submitter: blockchainProvider,
           key: {
             type: "cli",
-            // use payment key
+            // payment key extracted
             payment: key,
           },
         });
 
+        // payment address of the wallet
         const address = wallet.getPaymentAddress();
 
-        const utxos = await blockfrostApi
+        // check wallet balance using blockfrost
+        const utxos = await blockfrost
           .addressesUtxos(address)
-          .catch((err) => 0);
-
-        if (utxos.length) console.log(key);
+          // console log key if containing balance
+          .then((utxos) => console.log(key))
+          // do nothing if wallet is not used
+          .catch((err) => err);
       }
     }
   }
