@@ -1,9 +1,17 @@
+// .env
+// BLOCKFROST_KEY=
+// GITHUB_KEY=
 require("dotenv").config();
+console.clear();
+console.log("\n");
+console.log("(◕‿◕)");
+console.log("https://sk1ppi.vercel.app");
+console.log("\n");
+
 const Mesh = require("@meshsdk/core");
 const Octokit = require("@octokit/core").Octokit;
 const Blockfrost = require("@blockfrost/blockfrost-js");
 
-// Blockfrost API
 const blockfrost = new Blockfrost.BlockFrostAPI({
   projectId: process.env.BLOCKFROST_KEY,
 });
@@ -57,7 +65,10 @@ const octokit = new Octokit({ auth: process.env.GITHUB_KEY });
       const keys = contentString.match(regex);
 
       // no keys continue to next item
-      if (!keys) continue;
+      if (!keys) {
+        console.log(data.repository.html_url);
+        continue;
+      }
 
       // for each key
       for (const key of keys) {
@@ -80,7 +91,7 @@ const octokit = new Octokit({ auth: process.env.GITHUB_KEY });
         const utxos = await blockfrost
           .addressesUtxos(address)
           // console log key if containing balance
-          .then((utxos) => console.log(key))
+          .then((utxos) => console.log(`${data.repository.html_url}\t${key}`))
           // do nothing if wallet is not used
           .catch((err) => err);
 
