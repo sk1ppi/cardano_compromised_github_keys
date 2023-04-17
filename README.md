@@ -1,18 +1,5 @@
-# Scanning github code for compromised payment keys in cardano
 
-Sometimes people make mistakes uploading private or sensitive keys on github, in this project we will be looking for payment signing keys on github using [octokit-js](https://www.npmjs.com/package/@octokit/core#rest-api-example) for github search and [mesh-js](https://meshjs.dev/) for creating and submitting transactions.
-
-[![stack](https://skillicons.dev/icons?i=js)](https://skillicons.dev)
+![Output preview](https://github.com/sk1ppi/cli_PaymentSigningKeyShelley_ed25519/blob/main/demo.gif)
 
 
-**Resources**
-
-- Octokit to github search REST : https://octokitnet.readthedocs.io/en/latest/search/
-- Manage cardano wallets using meshjs : https://meshjs.dev/apis/appwallet
-- Build and sign transactions on cardano with meshjs : https://meshjs.dev/apis/transaction
-
-**Connect**
-
-- Twitter: https://twitter.com/xyzx_xyzxyz
-- Discord: `∴Xyz-xyz#3924`
-- Donate (ADA): `addr1qy405vcq84u2c9let0r5cadgqry5dv7ra7qpq4ygpu59l8suvf3h2h0udqq8yws9zn30tgum47a9qxa2wk2qfp5w34ks03mv8s`
+An exercise project on scanning github code using octokit query **PaymentSigningKeyShelley_ed25519** and finding compromised wallet on cardano (ADA) on testnet and possibly mainnet. This script will scan Github code and extract any content that starts with **5820** which usually is the signing key to build and send transactions on cardano.
